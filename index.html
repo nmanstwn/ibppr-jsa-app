@@ -3864,12 +3864,37 @@
               format: "a4",
             });
 
-            const pageW = 297;
             const marginL = 15;
             const marginR = 15;
+            const pageW = 297;
             const tableW = pageW - marginL - marginR;
 
-            // Load logo lalu generate PDF
+            const colNo = 12;
+            const colNoForm = 38;
+            const colTgl = 26;
+            const colResiko = 22;
+            const colJenis = 40;
+            const colLokasi = 28;
+            const colPJ =
+              tableW -
+              colNo -
+              colNoForm -
+              colTgl -
+              colResiko -
+              colJenis -
+              colLokasi;
+            const colLabel = 25;
+            const colVal = 45;
+            const colLogoJudul = tableW - colLabel - colVal;
+            const borderStyle = { lineColor: [0, 0, 0], lineWidth: 0.2 };
+            const baseStyle = {
+              ...borderStyle,
+              fillColor: [255, 255, 255],
+              textColor: [0, 0, 0],
+              fontSize: 8,
+              cellPadding: 2,
+            };
+
             const img = new Image();
             img.onload = function () {
               const canvas = document.createElement("canvas");
@@ -3878,112 +3903,154 @@
               canvas.getContext("2d").drawImage(img, 0, 0);
               const logoB64 = canvas.toDataURL("image/png");
 
-              // Logo HMJ kiri
-              doc.addImage(logoB64, "PNG", marginL, 8, 18, 18);
-
-              // Header tengah
-              doc.setFontSize(12);
-              doc.setFont("helvetica", "bold");
-              doc.text("FORM JSA LOG", pageW / 2, 18, { align: "center" });
-
-              // No. Dok kanan — pakai tabel kecil
-              doc.setFontSize(8);
-              doc.setFont("helvetica", "normal");
               doc.autoTable({
-                startY: 8,
-                margin: { left: pageW - 80 - marginR, right: marginR },
-                tableWidth: 80,
+                startY: 10,
+                margin: { left: marginL, right: marginR },
+                tableWidth: tableW,
                 body: [
-                  ["No. Dok", "FR/PK3/JSA/002"],
-                  ["No. Rev", "0"],
-                  ["Tgl Terbit", "10 Mei 2022"],
+                  [
+                    {
+                      content: "",
+                      rowSpan: 3,
+                      styles: { cellWidth: 22, minCellHeight: 22 },
+                    },
+                    {
+                      content: "FORM JSA LOG",
+                      rowSpan: 3,
+                      styles: {
+                        cellWidth: colLogoJudul - 22,
+                        halign: "center",
+                        valign: "middle",
+                        fontStyle: "bold",
+                        fontSize: 11,
+                      },
+                    },
+                    {
+                      content: "No. Dok",
+                      styles: { cellWidth: colLabel, fontStyle: "bold" },
+                    },
+                    {
+                      content: "FR/PK3/JSA/002",
+                      styles: { cellWidth: colVal },
+                    },
+                  ],
+                  [
+                    { content: "No. Rev", styles: { fontStyle: "bold" } },
+                    { content: "0" },
+                  ],
+                  [
+                    { content: "Tgl Terbit", styles: { fontStyle: "bold" } },
+                    { content: "10 Mei 2022" },
+                  ],
                 ],
-                styles: {
-                  fontSize: 8,
-                  cellPadding: 1.5,
-                  lineColor: [0, 0, 0],
-                  lineWidth: 0.2,
-                },
-                columnStyles: {
-                  0: { fontStyle: "bold", cellWidth: 30 },
-                  1: { cellWidth: 50 },
-                },
+                styles: { ...baseStyle },
                 theme: "grid",
+                didDrawCell(data) {
+                  if (data.row.index === 0 && data.column.index === 0) {
+                    doc.addImage(
+                      logoB64,
+                      "PNG",
+                      data.cell.x + 2,
+                      data.cell.y + 2,
+                      16,
+                      16,
+                    );
+                  }
+                },
               });
 
-              // Tabel utama data
               doc.autoTable({
-                startY: 28,
+                startY: doc.lastAutoTable.finalY,
                 margin: { left: marginL, right: marginR },
                 tableWidth: tableW,
                 head: [
                   [
-                    "No",
-                    "No. Form JSA",
-                    "Tanggal",
-                    "Resiko",
-                    "Jenis Pekerjaan",
-                    "Lokasi",
-                    "Penanggung Jawab",
+                    { content: "No", styles: { cellWidth: colNo } },
+                    {
+                      content: "No. Form JSA",
+                      styles: { cellWidth: colNoForm },
+                    },
+                    { content: "Tanggal", styles: { cellWidth: colTgl } },
+                    { content: "Resiko", styles: { cellWidth: colResiko } },
+                    {
+                      content: "Jenis Pekerjaan",
+                      styles: { cellWidth: colJenis },
+                    },
+                    { content: "Lokasi", styles: { cellWidth: colLokasi } },
+                    {
+                      content: "Penanggung Jawab",
+                      styles: { cellWidth: colPJ },
+                    },
                   ],
                 ],
                 body: list.map((e, i) => [
-                  i + 1,
-                  e.noFormJSA || "-",
-                  e.tanggal || "-",
-                  e.resiko || "-",
-                  e.jenisPekerjaan || "-",
-                  e.lokasi || "-",
-                  e.penanggungjawab || "-",
+                  { content: i + 1, styles: { halign: "center" } },
+                  { content: e.noFormJSA || "-", styles: { halign: "center" } },
+                  { content: e.tanggal || "-", styles: { halign: "center" } },
+                  { content: e.resiko || "-", styles: { halign: "center" } },
+                  {
+                    content: e.jenisPekerjaan || "-",
+                    styles: { halign: "center" },
+                  },
+                  { content: e.lokasi || "-", styles: { halign: "center" } },
+                  {
+                    content: e.penanggungjawab || "-",
+                    styles: { halign: "center" },
+                  },
                 ]),
-                styles: {
-                  fontSize: 8,
-                  cellPadding: 2,
-                  lineColor: [0, 0, 0],
-                  lineWidth: 0.2,
-                  halign: "center",
-                },
+                styles: { ...baseStyle },
                 headStyles: {
-                  fillColor: [255, 255, 255],
-                  textColor: [0, 0, 0],
+                  ...baseStyle,
                   fontStyle: "bold",
-                  lineColor: [0, 0, 0],
-                  lineWidth: 0.2,
+                  halign: "center",
                 },
                 theme: "grid",
               });
 
-              // Blok tanda tangan
-              const finalY = doc.lastAutoTable.finalY;
-              const colW = tableW / 3;
-
+              const colTTD = tableW / 3;
               doc.autoTable({
-                startY: finalY,
+                startY: doc.lastAutoTable.finalY,
                 margin: { left: marginL, right: marginR },
                 tableWidth: tableW,
                 body: [
-                  ["Diketahui", "Diperiksa", "Disusun"],
-                  ["", "", ""],
-                  ["", "", ""],
-                  ["", "", ""],
                   [
-                    "Hartono Mulyo Raharjo",
-                    "Adrian Soesanto",
-                    "Nur Rohman Setiawan",
+                    { content: "Diketahui", styles: { halign: "center" } },
+                    { content: "Diperiksa", styles: { halign: "center" } },
+                    { content: "Disusun", styles: { halign: "center" } },
                   ],
-                  ["Direktur", "Manajer Operasional", "Supervisor K3"],
+                  [
+                    { content: "", styles: { minCellHeight: 22 } },
+                    { content: "" },
+                    { content: "" },
+                  ],
+                  [
+                    {
+                      content: "Hartono Mulyo Raharjo",
+                      styles: { halign: "center", fontStyle: "bold" },
+                    },
+                    {
+                      content: "Adrian Soesanto",
+                      styles: { halign: "center", fontStyle: "bold" },
+                    },
+                    {
+                      content: "Nur Rohman Setiawan",
+                      styles: { halign: "center", fontStyle: "bold" },
+                    },
+                  ],
+                  [
+                    { content: "Direktur", styles: { halign: "center" } },
+                    {
+                      content: "Manajer Operasional",
+                      styles: { halign: "center" },
+                    },
+                    { content: "Supervisor K3", styles: { halign: "center" } },
+                  ],
                 ],
-                styles: {
-                  fontSize: 8,
-                  cellPadding: 2,
-                  lineColor: [0, 0, 0],
-                  lineWidth: 0.2,
-                  halign: "center",
-                },
+                styles: { ...baseStyle },
                 columnStyles: {
-                  0: { cellWidth: colW },
-                  1: { cellWidth: colW },
-                  2: { cellWidth: colW },
+                  0: { cellWidth: colTTD },
+                  1: { cellWidth: colTTD },
+                  2: { cellWidth: colTTD },
                 },
                 theme: "grid",
               });
