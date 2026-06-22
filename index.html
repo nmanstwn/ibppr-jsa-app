@@ -3947,14 +3947,10 @@
                 theme: "grid",
                 didDrawCell(data) {
                   if (data.row.index === 0 && data.column.index === 0) {
-                    doc.addImage(
-                      logoB64,
-                      "PNG",
-                      data.cell.x + 2,
-                      data.cell.y + 2,
-                      16,
-                      16,
-                    );
+                    const logoSize = 18;
+                    const cx = data.cell.x + (data.cell.width - logoSize) / 2;
+                    const cy = data.cell.y + (data.cell.height - logoSize) / 2;
+                    doc.addImage(logoB64, "PNG", cx, cy, logoSize, logoSize);
                   }
                 },
               });
