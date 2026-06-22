@@ -3028,6 +3028,7 @@
       function fmtDate(d) {
         if (!d) return "-";
         if (!d || String(d).trim() === "") return "-";
+        const s = String(d).trim();
         const dt = new Date(s + "T00:00:00");
         if (isNaN(dt.getTime())) return "-";
         return dt.toLocaleDateString("id-ID", {
