@@ -3864,70 +3864,133 @@
               format: "a4",
             });
 
-            // Header
-            doc.setFontSize(14);
-            doc.setFont("helvetica", "bold");
-            doc.text("FORM JSA LOG", 148, 20, { align: "center" });
+            const pageW = 297;
+            const marginL = 15;
+            const marginR = 15;
+            const tableW = pageW - marginL - marginR;
 
-            doc.setFontSize(9);
-            doc.setFont("helvetica", "normal");
-            doc.text("No. Dok : FR/PK3/JSA/002", 230, 12);
-            doc.text("No. Rev : 0", 230, 17);
-            doc.text("Tgl Terbit : 10 MEI 2022", 230, 22);
+            // Load logo lalu generate PDF
+            const img = new Image();
+            img.onload = function () {
+              const canvas = document.createElement("canvas");
+              canvas.width = img.width;
+              canvas.height = img.height;
+              canvas.getContext("2d").drawImage(img, 0, 0);
+              const logoB64 = canvas.toDataURL("image/png");
 
-            // Tabel data
-            doc.autoTable({
-              startY: 30,
-              head: [
-                [
-                  "No",
-                  "No. Form JSA",
-                  "Tanggal",
-                  "Resiko",
-                  "Jenis Pekerjaan",
-                  "Lokasi",
-                  "Penanggung Jawab",
+              // Logo HMJ kiri
+              doc.addImage(logoB64, "PNG", marginL, 8, 18, 18);
+
+              // Header tengah
+              doc.setFontSize(12);
+              doc.setFont("helvetica", "bold");
+              doc.text("FORM JSA LOG", pageW / 2, 18, { align: "center" });
+
+              // No. Dok kanan — pakai tabel kecil
+              doc.setFontSize(8);
+              doc.setFont("helvetica", "normal");
+              doc.autoTable({
+                startY: 8,
+                margin: { left: pageW - 80 - marginR, right: marginR },
+                tableWidth: 80,
+                body: [
+                  ["No. Dok", "FR/PK3/JSA/002"],
+                  ["No. Rev", "0"],
+                  ["Tgl Terbit", "10 Mei 2022"],
                 ],
-              ],
-              body: list.map((e, i) => [
-                i + 1,
-                e.noFormJSA || "-",
-                e.tanggal || "-",
-                e.resiko || "-",
-                e.jenisPekerjaan || "-",
-                e.lokasi || "-",
-                e.penanggungjawab || "-",
-              ]),
-              styles: { fontSize: 9, cellPadding: 3 },
-              headStyles: {
-                fillColor: [245, 160, 0],
-                textColor: 255,
-                fontStyle: "bold",
-              },
-              alternateRowStyles: { fillColor: [255, 248, 230] },
-              margin: { left: 10, right: 10 },
-            });
+                styles: {
+                  fontSize: 8,
+                  cellPadding: 1.5,
+                  lineColor: [0, 0, 0],
+                  lineWidth: 0.2,
+                },
+                columnStyles: {
+                  0: { fontStyle: "bold", cellWidth: 30 },
+                  1: { cellWidth: 50 },
+                },
+                theme: "grid",
+              });
 
-            // Tanda tangan
-            const finalY = doc.lastAutoTable.finalY + 10;
-            doc.setFontSize(9);
-            doc.text("Diketahui", 40, finalY, { align: "center" });
-            doc.text("Diperiksa", 148, finalY, { align: "center" });
-            doc.text("Disusun", 255, finalY, { align: "center" });
-            doc.text("Hartono Mulyo Raharjo", 40, finalY + 25, {
-              align: "center",
-            });
-            doc.text("Adrian Soesanto", 148, finalY + 25, { align: "center" });
-            doc.text("Nur Rohman Setiawan", 255, finalY + 25, {
-              align: "center",
-            });
-            doc.text("Direktur", 40, finalY + 30, { align: "center" });
-            doc.text("Manajer Operasional", 148, finalY + 30, {
-              align: "center",
-            });
-            doc.text("Supervisor K3", 255, finalY + 30, { align: "center" });
+              // Tabel utama data
+              doc.autoTable({
+                startY: 28,
+                margin: { left: marginL, right: marginR },
+                tableWidth: tableW,
+                head: [
+                  [
+                    "No",
+                    "No. Form JSA",
+                    "Tanggal",
+                    "Resiko",
+                    "Jenis Pekerjaan",
+                    "Lokasi",
+                    "Penanggung Jawab",
+                  ],
+                ],
+                body: list.map((e, i) => [
+                  i + 1,
+                  e.noFormJSA || "-",
+                  e.tanggal || "-",
+                  e.resiko || "-",
+                  e.jenisPekerjaan || "-",
+                  e.lokasi || "-",
+                  e.penanggungjawab || "-",
+                ]),
+                styles: {
+                  fontSize: 8,
+                  cellPadding: 2,
+                  lineColor: [0, 0, 0],
+                  lineWidth: 0.2,
+                  halign: "center",
+                },
+                headStyles: {
+                  fillColor: [255, 255, 255],
+                  textColor: [0, 0, 0],
+                  fontStyle: "bold",
+                  lineColor: [0, 0, 0],
+                  lineWidth: 0.2,
+                },
+                theme: "grid",
+              });
 
-            doc.save("JSA-LOG.pdf");
+              // Blok tanda tangan
+              const finalY = doc.lastAutoTable.finalY;
+              const colW = tableW / 3;
+
+              doc.autoTable({
+                startY: finalY,
+                margin: { left: marginL, right: marginR },
+                tableWidth: tableW,
+                body: [
+                  ["Diketahui", "Diperiksa", "Disusun"],
+                  ["", "", ""],
+                  ["", "", ""],
+                  ["", "", ""],
+                  [
+                    "Hartono Mulyo Raharjo",
+                    "Adrian Soesanto",
+                    "Nur Rohman Setiawan",
+                  ],
+                  ["Direktur", "Manajer Operasional", "Supervisor K3"],
+                ],
+                styles: {
+                  fontSize: 8,
+                  cellPadding: 2,
+                  lineColor: [0, 0, 0],
+                  lineWidth: 0.2,
+                  halign: "center",
+                },
+                columnStyles: {
+                  0: { cellWidth: colW },
+                  1: { cellWidth: colW },
+                  2: { cellWidth: colW },
+                },
+                theme: "grid",
+              });
+
+              doc.save("JSA-LOG.pdf");
+            };
+            img.src = "logo.png";
           },
         };
       })();
