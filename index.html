@@ -3027,7 +3027,9 @@
       // Format tanggal → "18 Jun 2026"
       function fmtDate(d) {
         if (!d) return "-";
-        const dt = new Date(d + "T00:00:00");
+        if (!d || String(d).trim() === "") return "-";
+        const dt = new Date(s + "T00:00:00");
+        if (isNaN(dt.getTime())) return "-";
         return dt.toLocaleDateString("id-ID", {
           day: "2-digit",
           month: "short",
