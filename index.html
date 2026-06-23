@@ -3859,30 +3859,23 @@
 
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({
-              orientation: "landscape",
+              orientation: "portrait",
               unit: "mm",
               format: "a4",
             });
 
             const marginL = 15;
             const marginR = 15;
-            const pageW = 297;
+            const pageW = 210;
             const tableW = pageW - marginL - marginR;
 
-            const colNo = 12;
-            const colNoForm = 38;
-            const colTgl = 26;
-            const colResiko = 22;
-            const colJenis = 40;
-            const colLokasi = 28;
-            const colPJ =
-              tableW -
-              colNo -
-              colNoForm -
-              colTgl -
-              colResiko -
-              colJenis -
-              colLokasi;
+            const colNo = tableW * 0.05;
+            const colNoForm = tableW * 0.15;
+            const colTgl = tableW * 0.12;
+            const colResiko = tableW * 0.1;
+            const colJenis = tableW * 0.15;
+            const colLokasi = tableW * 0.215;
+            const colPJ = tableW * 0.215;
             const colLabel = 25;
             const colVal = 45;
             const colLogoJudul = tableW - colLabel - colVal;
@@ -3994,18 +3987,6 @@
                   }
                 },
               });
-              // ── SPACER SETELAH HEADER ──
-              doc.autoTable({
-                startY: doc.lastAutoTable.finalY,
-                margin: { left: marginL, right: marginR },
-                tableWidth: tableW,
-                body: [
-                  [{ content: "", styles: { minCellHeight: 5, lineWidth: 0 } }],
-                ],
-                styles: { lineWidth: 0, fillColor: [255, 255, 255] },
-                theme: "plain",
-              });
-
               // ── TABEL DATA ──
               doc.autoTable({
                 startY: doc.lastAutoTable.finalY,
@@ -4114,7 +4095,7 @@
               // ── FOOTER (satu blok, tidak boleh terpecah) ──
               const colTTD = tableW / 3;
               const footerH = 52;
-              const pageH = 200; // A4 landscape usable
+              const pageH = 277; // A4 portrait usable
               const spaceLeft = pageH - doc.lastAutoTable.finalY;
               const footerStartY =
                 spaceLeft < footerH
