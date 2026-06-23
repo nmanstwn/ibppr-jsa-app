@@ -4044,6 +4044,10 @@
               });
 
               // ── TANDA TANGAN ──
+              const pageH = 210;
+              const footerH = 55;
+              const spaceLeft = pageH - doc.lastAutoTable.finalY;
+              if (spaceLeft < footerH) doc.addPage();
               const colTTD = tableW / 3;
               doc.autoTable({
                 startY: doc.lastAutoTable.finalY,
