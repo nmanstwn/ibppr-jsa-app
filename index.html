@@ -3879,7 +3879,7 @@
             const colLabel = 25;
             const colVal = 45;
             const colLogoJudul = tableW - colLabel - colVal;
-            const borderStyle = { lineColor: [0, 0, 0], lineWidth: 0.2 };
+            const borderStyle = { lineColor: [0, 0, 0], lineWidth: 0.3 };
             const baseStyle = {
               ...borderStyle,
               fillColor: [255, 255, 255],
@@ -4165,18 +4165,6 @@
                   2: { cellWidth: colTTD },
                 },
                 theme: "grid",
-                didDrawCell(data) {
-                  // Underline nama (baris index 2)
-                  if (data.row.index === 2 && data.cell.text[0]) {
-                    const txt = data.cell.text[0];
-                    const tw = doc.getTextWidth(txt);
-                    const cx = data.cell.x + (data.cell.width - tw) / 2;
-                    const cy = data.cell.y + data.cell.height - 3;
-                    doc.setDrawColor(0, 0, 0);
-                    doc.setLineWidth(0.2);
-                    doc.line(cx, cy, cx + tw, cy);
-                  }
-                },
               });
               doc.save("JSA-LOG.pdf");
             }
